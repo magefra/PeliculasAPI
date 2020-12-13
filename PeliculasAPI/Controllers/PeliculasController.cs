@@ -19,7 +19,7 @@ namespace PeliculasAPI.Controllers
 {
     [ApiController]
     [Route("api/peliculas")]
-    public class PeliculasController : ControllerBase
+    public class PeliculasController : BaseController
     {
         /// <summary>
         /// 
@@ -55,6 +55,7 @@ namespace PeliculasAPI.Controllers
                                     IMapper mapper,
                                     IAlmacenadorArchivos almacenadorArchivos,
                                     ILogger<PeliculasController> logger)
+            :base(applicationDbContext, mapper)
         {
             _applicationDbContext = applicationDbContext;
             _mapper = mapper;
@@ -284,41 +285,7 @@ namespace PeliculasAPI.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<PeliculaPathDTO> patchDocument)
         {
-            if (patchDocument == null)
-            {
-                return BadRequest();
-            }
-
-
-            var entidadDB = await _applicationDbContext.Actores.FirstOrDefaultAsync(x => x.Id == id);
-
-            if (entidadDB == null)
-            {
-                return NotFound();
-            }
-
-
-            var entidadDTO = _mapper.Map<PeliculaPathDTO>(entidadDB);
-
-            patchDocument.ApplyTo(entidadDTO, ModelState);
-
-
-            var esValido = TryValidateModel(entidadDTO);
-
-            if (!esValido)
-            {
-                return BadRequest(ModelState);
-            }
-
-            _mapper.Map(entidadDTO, entidadDB);
-
-
-            await _applicationDbContext.SaveChangesAsync();
-
-
-            return NoContent();
-
-
+            return await Patch<Pelicula, PeliculaPathDTO>(id, patchDocument);
         }
 
 
@@ -326,20 +293,7 @@ namespace PeliculasAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await _applicationDbContext.Peliculas.AnyAsync(x => x.Id == id);
-            if (!existe)
-            {
-                return NotFound();
-            }
-
-            _applicationDbContext.Remove(new Pelicula()
-            {
-                Id = id
-            });
-
-            await _applicationDbContext.SaveChangesAsync();
-
-            return NoContent();
+            return await Delete<Pelicula>(id);
         }
     }
 }

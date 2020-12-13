@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PeliculasAPI.Data;
+using PeliculasAPI.DTOs;
 using PeliculasAPI.Entidades;
+using PeliculasAPI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +51,26 @@ namespace PeliculasAPI.Controllers
         }
 
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntidad"></typeparam>
+        /// <typeparam name="TDTO"></typeparam>
+        /// <param name="paginacionDTO"></param>
+        /// <returns></returns>
+        protected async Task<List<TDTO>> Get<TEntidad,TDTO>(PaginacionDTO paginacionDTO)
+            where TEntidad : class
+        {
+            var queryable = _applicationDbContext.Set<TEntidad>().AsQueryable();
+            await HttpContext.InsertarParametrosPaginacion(queryable, paginacionDTO.CantidadRegistroPagina);
+
+
+            var entidades = await queryable.Paginar(paginacionDTO).ToListAsync();
+            return _mapper.Map<List<TDTO>>(entidades);
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -61,7 +84,6 @@ namespace PeliculasAPI.Controllers
                                                      .AsNoTracking()
                                                      .FirstOrDefaultAsync(x => x.Id == id);
 
-            string hola = "";
 
             if(entidad == null)
             {
@@ -116,6 +138,55 @@ namespace PeliculasAPI.Controllers
             await _applicationDbContext.SaveChangesAsync();
 
             return NoContent();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntidad"></typeparam>
+        /// <typeparam name="TDTO"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="patchDocument"></param>
+        /// <returns></returns>
+        protected async Task<ActionResult> Patch<TEntidad, TDTO>(int id, JsonPatchDocument<TDTO> patchDocument)
+            where TDTO : class
+            where TEntidad : class, IId
+        {
+            if (patchDocument == null)
+            {
+                return BadRequest();
+            }
+
+
+            var entidadDB = await _applicationDbContext.Set<TEntidad>().FirstOrDefaultAsync(x => x.Id == id);
+
+            if (entidadDB == null)
+            {
+                return NotFound();
+            }
+
+
+            var entidadDTO = _mapper.Map<TDTO>(entidadDB);
+
+            patchDocument.ApplyTo(entidadDTO, ModelState);
+
+
+            var esValido = TryValidateModel(entidadDTO);
+
+            if (!esValido)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _mapper.Map(entidadDTO, entidadDB);
+
+
+            await _applicationDbContext.SaveChangesAsync();
+
+
+            return NoContent();
+
         }
 
 
