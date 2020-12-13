@@ -34,6 +34,10 @@ namespace PeliculasAPI.DTOs
 
         public bool ProximosEstrenos { get; set; }
 
+        public string CampoOrdernar { get; set; }
+
+        public bool OrdernAscente { get; set; } = true;
+
 
     }
 

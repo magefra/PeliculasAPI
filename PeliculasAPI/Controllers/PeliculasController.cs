@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
+using Microsoft.Extensions.Logging;
 
 namespace PeliculasAPI.Controllers
 {
@@ -35,6 +37,11 @@ namespace PeliculasAPI.Controllers
         /// </summary>
         private readonly IAlmacenadorArchivos _almacenadorArchivos;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILogger<PeliculasController> _logger;
+
 
         /// <summary>
         /// 
@@ -46,11 +53,13 @@ namespace PeliculasAPI.Controllers
 
         public PeliculasController(ApplicationDbContext applicationDbContext,
                                     IMapper mapper,
-                                    IAlmacenadorArchivos almacenadorArchivos)
+                                    IAlmacenadorArchivos almacenadorArchivos,
+                                    ILogger<PeliculasController> logger)
         {
             _applicationDbContext = applicationDbContext;
             _mapper = mapper;
             _almacenadorArchivos = almacenadorArchivos;
+            _logger = logger;
         }
 
 
@@ -79,7 +88,7 @@ namespace PeliculasAPI.Controllers
 
 
 
-            var resultado  = new PeliculasIndexDTO();
+            var resultado = new PeliculasIndexDTO();
             resultado.FuturosEstrenos = _mapper.Map<List<PeliculaDTO>>(proximosEstrenos);
             resultado.EnCines = _mapper.Map<List<PeliculaDTO>>(enCines);
 
@@ -111,7 +120,7 @@ namespace PeliculasAPI.Controllers
                 peliculasQueryable = peliculasQueryable.Where(x => x.FechaEstreno > hoy);
             }
 
-            if(filtroPeliculasDTO.GeneroId > 0)
+            if (filtroPeliculasDTO.GeneroId > 0)
             {
                 peliculasQueryable = peliculasQueryable
                                      .Where(x => x.PeliculasGeneros.Select(y => y.GeneroId)
@@ -128,6 +137,25 @@ namespace PeliculasAPI.Controllers
                                                            filtroPeliculasDTO.CantidadRegistrosPagina);
 
 
+            if (!string.IsNullOrEmpty(filtroPeliculasDTO.CampoOrdernar))
+            {
+                var tipoOrden = filtroPeliculasDTO.OrdernAscente ? "ascending" : "descending";
+
+                try
+                {
+                    peliculasQueryable = peliculasQueryable.OrderBy(
+                                    $"{filtroPeliculasDTO.CampoOrdernar} {tipoOrden}");
+                }
+                catch (Exception ex)
+                {
+
+                    _logger.LogError(ex.Message, ex);
+                }
+
+
+
+            }
+
             var peliculas = await peliculasQueryable.Paginar(filtroPeliculasDTO.Paginacion).ToListAsync();
 
             return _mapper.Map<List<PeliculaDTO>>(peliculas);
@@ -140,7 +168,7 @@ namespace PeliculasAPI.Controllers
         public async Task<ActionResult<PeliculaDetalleDTO>> Get(int id)
         {
             var pelicula = await _applicationDbContext.Peliculas
-                                    .Include( x => x.PeliculaActores)
+                                    .Include(x => x.PeliculaActores)
                                     .ThenInclude(x => x.Actor)
                                     .Include(x => x.PeliculasGeneros)
                                     .ThenInclude(x => x.Genero)
