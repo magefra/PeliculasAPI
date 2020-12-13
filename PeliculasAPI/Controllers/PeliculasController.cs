@@ -150,6 +150,7 @@ namespace PeliculasAPI.Controllers
                 {
 
                     _logger.LogError(ex.Message, ex);
+
                 }
 
 
