@@ -19,6 +19,8 @@ namespace PeliculasAPI.Helpers
 
 
             CreateMap<Pelicula, PeliculaDTO>().ReverseMap();
+
+
             CreateMap<PeliculaCreacionDTO, Pelicula>()
                 .ForMember(x => x.Poster, options => options.Ignore())
                 .ForMember(x => x.PeliculasGeneros, options => options.MapFrom(MapPeliculasGeneros))

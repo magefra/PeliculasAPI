@@ -96,6 +96,9 @@ namespace PeliculasAPI.Controllers
             return resultado;
         }
 
+
+
+
         [HttpGet("filtro")]
         public async Task<ActionResult<List<PeliculaDTO>>> Filtrar([FromQuery] FiltroPeliculasDTO filtroPeliculasDTO)
         {
@@ -107,6 +110,7 @@ namespace PeliculasAPI.Controllers
             {
                 peliculasQueryable = peliculasQueryable.Where(x => x.Titulo.Contains(filtroPeliculasDTO.Titulo));
             }
+
 
             if (filtroPeliculasDTO.Encines)
             {
