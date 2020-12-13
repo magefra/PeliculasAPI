@@ -61,6 +61,7 @@ namespace PeliculasAPI.Controllers
                                                      .AsNoTracking()
                                                      .FirstOrDefaultAsync(x => x.Id == id);
 
+            string hola = "";
 
             if(entidad == null)
             {
