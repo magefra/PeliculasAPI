@@ -23,6 +23,10 @@ namespace PeliculasAPI.Data
 
 
 
+            modelBuilder.Entity<PeliculasSalasCine>()
+                .HasKey(x => new { x.SalaCineId, x.PeliculaId });
+
+
             SeedData(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
@@ -34,12 +38,23 @@ namespace PeliculasAPI.Data
         public DbSet<Pelicula> Peliculas { get; set; }
         public DbSet<PeliculaActores> PeliculaActores { get; set; }
         public DbSet<PeliculasGeneros> PeliculasGeneros { get; set; }
+        public DbSet<SalaCine> SalasCine { get; set; }
+        public DbSet<PeliculasSalasCine> PeliculasSalasCine { get; set; }
 
 
         private void SeedData(ModelBuilder modelBuilder)
         {
+            //var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
-            
+            //modelBuilder.Entity<SalaCine>()
+            //  .HasData(new List<SalaCine>
+            //  {
+            //        //new SalaDeCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
+            //        new SalaCine{Id = 4, Nombre = "Sambil", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9118804, 18.4826214))},
+            //        new SalaCine{Id = 5, Nombre = "Megacentro", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.856427, 18.506934))},
+            //        new SalaCine{Id = 6, Nombre = "Village East Cinema", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))}
+            //  });
+
             var aventura = new Genero() { Id = 4, Nombre = "Aventura" };
             var animation = new Genero() { Id = 5, Nombre = "Animación" };
             var suspenso = new Genero() { Id = 6, Nombre = "Suspenso" };

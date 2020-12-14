@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PeliculasAPI.DTOs;
+using PeliculasAPI.DTOs.SalaCine;
 using PeliculasAPI.Entidades;
 using System.Collections.Generic;
 
@@ -11,6 +12,10 @@ namespace PeliculasAPI.Helpers
         {
             CreateMap<Genero, GeneroDTO>().ReverseMap();
             CreateMap<GeneroCreacionDTO, Genero>();
+
+            CreateMap<SalaCine, SalaCineDTO>().ReverseMap();
+            CreateMap<SalaCineCreacionDTO, SalaCine>().ReverseMap();
+
 
             CreateMap<Actor, ActorDTO>().ReverseMap();
             CreateMap<ActorCreacionDTO, Actor>()
