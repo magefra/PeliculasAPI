@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using PeliculasAPI.Entidades;
 using System;
 using System.Collections.Generic;
@@ -44,16 +46,16 @@ namespace PeliculasAPI.Data
 
         private void SeedData(ModelBuilder modelBuilder)
         {
-            //var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
-            //modelBuilder.Entity<SalaCine>()
-            //  .HasData(new List<SalaCine>
-            //  {
-            //        //new SalaDeCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
-            //        new SalaCine{Id = 4, Nombre = "Sambil", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9118804, 18.4826214))},
-            //        new SalaCine{Id = 5, Nombre = "Megacentro", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.856427, 18.506934))},
-            //        new SalaCine{Id = 6, Nombre = "Village East Cinema", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))}
-            //  });
+            modelBuilder.Entity<SalaCine>()
+              .HasData(new List<SalaCine>
+              {
+                    new SalaCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
+                    new SalaCine{Id = 4, Nombre = "Sambil", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9118804, 18.4826214))},
+                    new SalaCine{Id = 5, Nombre = "Megacentro", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.856427, 18.506934))},
+                    new SalaCine{Id = 6, Nombre = "Village East Cinema", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))}
+              });
 
             var aventura = new Genero() { Id = 4, Nombre = "Aventura" };
             var animation = new Genero() { Id = 5, Nombre = "Animación" };
